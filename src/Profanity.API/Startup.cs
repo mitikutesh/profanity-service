@@ -37,7 +37,7 @@ namespace Profanity.API
             {
                 options.UseSqlite(
                     Configuration.GetSection("ProfanityDatabaseSettings:ConnectionString")?.Value ?? throw new Exception("Null connection string."),
-                    a => a.MigrationsAssembly("ProfanityService.Data"));
+                    a => a.MigrationsAssembly("Profanity.Data"));
             });
             services.AddSwaggerGen(c =>
             {
