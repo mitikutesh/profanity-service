@@ -1,4 +1,6 @@
 ﻿using Profanity.Data.DTO;
+using Profanity.Data.Entities;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,14 +8,14 @@ namespace Profanity.Data.Repositories
 {
     public interface IProfanityWord
     {
-        Task<bool> AddAsync(ProfanityDTO prospect);
+        Task<ProfanityDTO> GetProfanityAsync(Guid id);
 
-        Task<List<ProfanityDTO>> GetProfanityListAsync();
+        Task<ProfanityDTO> GetProfanityByLanguageAsync(Language language);
 
-        Task<ProfanityDTO> GetPrfanityAsync(int id);
+        Task<bool> AddToProfanityAsync(ProfanityDTO prospect);
 
-        Task<bool> EditProfanityAsync(ProfanityDTO prospect);
+        Task<bool> DeleteProfanityAsync(ProfanityDTO profanityDTO);
 
-        Task<bool> DeleteProfanityAsync(int id);
+        Task<bool> DeleteAllProfanityAsync();
     }
 }

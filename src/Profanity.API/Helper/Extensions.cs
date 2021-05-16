@@ -17,12 +17,6 @@ namespace Profanity.API.Helper
                 using (var fileStream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(fileStream);
-                    //using (BinaryReader br = new BinaryReader(fileStream))
-                    //{
-                    //    byte[] bytes = br.ReadBytes((int)fileStream.Length);
-                    //}
-
-
                     string text = encoding.GetString(fileStream.ToArray());
                     fileStream.Flush();
 

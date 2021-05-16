@@ -1,4 +1,5 @@
 ﻿using Profanity.Data.DTO;
+using Profanity.Data.Entities;
 using Profanity.Data.Repositories;
 using System;
 using System.Collections.Generic;
@@ -22,14 +23,12 @@ namespace Profanity.Service
         public ProfanityServiceBase(IProfanityWord profanityDataService)
         {
             _profanityDataService = profanityDataService;
-            _ = initAsync();
+            var result = _profanityDataService.GetProfanityByLanguageAsync(Data.Entities.Language.EN).Result;
+            if (result != null)
+                _profanities = result.ProfanityWord;
         }
 
-        private async Task initAsync()
-        {
-            var result = await _profanityDataService.GetPrfanityAsync(new Guid("5AFE2611-E655-4001-AEC6-798CFFC6F48F"));
-            _profanities = result.ProfanityWord;
-        }
+
         /// <summary>
         ///allows custom  profanities replacing the existing list.
         /// </summary>
@@ -48,75 +47,40 @@ namespace Profanity.Service
         /// Add profanity words to the existing words.
         /// </summary>
         /// <param name="profanity">Additional profanit to add.</param>
-        public void AddProfanity(string profanity)
+        public async Task<bool> AddProfanityAsync(ProfanityDTO profanity)
         {
-            if (string.IsNullOrEmpty(profanity))
+            if (profanity == null)
             {
                 throw new ArgumentNullException(nameof(profanity));
             }
-
-            _profanities.Add(profanity);
+            var response = await _profanityDataService.AddToProfanityAsync(profanity);
+            return response;
         }
 
-        /// <summary>
-        /// Add a custom list profanities to the existing list with out replacing the existing one.
-        /// </summary>
-        /// <param name="profanityList">Profanities to add.</param>
-        public void AddProfanity(List<string> profanityList)
+        public async Task<bool> RemoveProfanityAsync(ProfanityDTO profanity)
         {
-            if (profanityList == null)
-            {
-                throw new ArgumentNullException(nameof(profanityList));
-            }
-
-            _profanities.AddRange(profanityList);
-        }
-
-        /// <summary>
-        /// delete a profanity from the loaded list.
-        /// </summary>
-        /// <param name="profanity">The profanity to be removed.</param>
-        /// <returns>True if profanity is removed. Otherwise False.</returns>
-        public bool RemoveProfanity(string profanity)
-        {
-            if (string.IsNullOrEmpty(profanity))
+            if (profanity != null)
             {
                 throw new ArgumentNullException(nameof(profanity));
             }
-
-            return _profanities.Remove(profanity.ToLower(CultureInfo.InvariantCulture));
+            var response  = await _profanityDataService.DeleteProfanityAsync(profanity);
+            return response;
         }
 
-        /// <summary>
-        /// delete list of profanities from the loaded list..
-        /// </summary>
-        /// <param name="profanities">prfanities to be removed.</param>
-        /// <returns>True if the profanities is removed. otherwise False.</returns>
-        public bool RemoveProfanity(List<string> profanities)
+        public async Task<List<string>> GetAllProfanitiesAsync(Language language)
         {
-            if (profanities == null)
-            {
-                throw new ArgumentNullException(nameof(profanities));
-            }
-
-            foreach (string naughtyWord in profanities)
-            {
-                if (!RemoveProfanity(naughtyWord))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            var profanityDTO = await _profanityDataService.GetProfanityByLanguageAsync(language);
+            return profanityDTO?.ProfanityWord;
         }
 
         /// <summary>
         /// clear or delete current loaded list.
         /// </summary>
-        public void Clear()
-        {
-            _profanities.Clear();
-        }
+        public async Task<bool> ClearAsync()
+           =>  await _profanityDataService.DeleteAllProfanityAsync();
+
+        public async Task<bool> ClearAsync(Language language)
+       => await _profanityDataService.DeleteAllProfanityAsync();
 
         /// <summary>
         /// Countes and return number of profanities in a text.
@@ -129,4 +93,5 @@ namespace Profanity.Service
             }
         }
     }
+
 }

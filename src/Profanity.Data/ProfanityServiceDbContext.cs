@@ -21,12 +21,23 @@ namespace Profanity.Data
             modelBuilder.Entity<ProfanityEntity>(entity =>
             {
                 entity.HasKey(e => e.Id);
+                entity.Property(e => e.Language)
+                .HasConversion<int>();
+                
             });
             base.OnModelCreating(modelBuilder);
         }
 
         private static void OnModelCreatingPartial(ModelBuilder modelBuilder)
         {
+        }
+    }
+
+    public static class EntityExtensions
+    {
+        public static void Clear<T>(this DbSet<T> dbSet) where T : class
+        {
+            dbSet.RemoveRange(dbSet);
         }
     }
 }

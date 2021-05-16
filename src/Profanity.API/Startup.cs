@@ -1,3 +1,4 @@
+using AutoWrapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -66,6 +67,10 @@ namespace Profanity.API
             services.AddTransient<IValidator<ProfanityEntity>, ProfanityEntityValidator>();
 
             services.AddAutoMapper(typeof(Startup));
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,6 +84,13 @@ namespace Profanity.API
             }
 
             app.UseHttpsRedirection();
+            app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions {
+                UseApiProblemDetailsException = true ,
+                ShowApiVersion = true, 
+                ApiVersion = "2.0",
+                IsApiOnly = false,
+                WrapWhenApiPathStartsWith = "/api"
+            });
 
             app.UseRouting();
 

@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Profanity.Data.DTO;
+using Profanity.Data.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Profanity.Service.Interfaces
 {
@@ -12,17 +15,16 @@ namespace Profanity.Service.Interfaces
 
         bool ContainsProfanity(string term);
 
-
         (int, int, string)? GetCompleteWord(string toCheck, string profanity);
 
-        void AddProfanity(string profanity);
-        void AddProfanity(List<string> profanityList);
 
-        bool RemoveProfanity(string profanity);
-        bool RemoveProfanity(List<string> profanities);
+        Task<bool> AddProfanityAsync(ProfanityDTO profanity);
+        Task<bool> RemoveProfanityAsync(ProfanityDTO profanity);
 
-        void Clear();
+        Task<bool> ClearAsync();
+        Task<bool> ClearAsync(Language language);
 
+        Task<List<string>> GetAllProfanitiesAsync(Language language);
         int Count { get; }
     }
 }
