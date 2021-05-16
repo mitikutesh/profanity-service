@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoWrapper.Extensions;
 using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,6 @@ using Profanity.Data.Entities;
 using Profanity.Service.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,8 +26,8 @@ namespace Profanity.API.Controllers
             _profanityService = profanityService;
             _mapper = mapper;
         }
-       
-        [HttpPost("check-text-for-profanity")]
+
+        [HttpPost(EndPoints.CheckProfanity)]
         public async Task<ApiResponse> Post([FromForm(Name = "file")] IFormFile file, Language language)
         {
             if (!ModelState.IsValid)
@@ -42,54 +40,71 @@ namespace Profanity.API.Controllers
                 var l = language;
                 var text = await file.ToByteArray(Encoding.UTF8);
                 if (string.IsNullOrWhiteSpace(text)) return default;
-                
-                var response = new ResponseModel();
-                response.IsProfanity = _profanityService.ContainsProfanity(text);
-                response.FoundProfanityWords = _profanityService.FindAllProfanities(text);
-                response.Count = response.FoundProfanityWords.Count();
-                response.ElapasedTime = 0;
 
+                var result = _profanityService.ContainsProfanity(text);
+
+                var response = new ResponseModel
+                {
+                    IsProfanity = result.Value.Item1,
+                    FoundProfanityWords = result.Value.Item2,
+                    Count = result.Value.Item3,
+                    ElapasedTime = result.Value.Item4
+                };
                 return new ApiResponse(response);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
-
         }
-        //throw new ApiProblemDetailsException($"Record with id: {id} does not exist.", Status404NotFound); 
-        [HttpPut("add-words-to-profanity-list")]
-        public async Task<IActionResult> PostAddToProfanityList([FromBody]RequestModel request)
+
+        [HttpPut(EndPoints.AddWordToProfanity)]
+        public async Task<IActionResult> PostAddToProfanityList([FromBody] RequestModel request)
         {
-            var result  = _mapper.Map<RequestModel, ProfanityDTO>(request);
+            if (!ModelState.IsValid)
+            {
+                throw new ApiProblemDetailsException(ModelState);
+            }
+            var result = _mapper.Map<RequestModel, ProfanityDTO>(request);
             var response = await _profanityService.AddProfanityAsync(result);
             return Ok(response);
         }
 
-        [HttpPost("remove-word-from-prfanity-list")]
-        public async Task<ActionResult<bool>> PostRemoveFromProfanityList([FromBody]RequestModel request)
+        [HttpPost(EndPoints.RemoveWordFromProfanity)]
+        public async Task<ActionResult<bool>> PostRemoveFromProfanityList([FromBody] RequestModel request)
         {
+            if (!ModelState.IsValid)
+            {
+                throw new ApiProblemDetailsException(ModelState);
+            }
+
             return Ok(await _profanityService.RemoveProfanityAsync(_mapper.Map<RequestModel, ProfanityDTO>(request)));
         }
 
-        [HttpGet("get-all-profanity")]
+        [HttpGet(EndPoints.GetProfanitites)]
         public async Task<ActionResult<List<string>>> Get(Language language)
         {
+            if (!ModelState.IsValid)
+            {
+                throw new ApiProblemDetailsException(ModelState);
+            }
             return Ok(await _profanityService.GetAllProfanitiesAsync(language));
         }
 
-        [HttpDelete("clear-profanity")]
+        [HttpDelete(EndPoints.ClearSpecificProfanitites)]
         public async Task<ActionResult<bool>> DeleteByLanguage(Language language)
         {
+            if (!ModelState.IsValid)
+            {
+                throw new ApiProblemDetailsException(ModelState);
+            }
             return Ok(await _profanityService.ClearAsync(language));
         }
 
-        [HttpDelete("clear-all-profanity")]
+        [HttpDelete(EndPoints.ClearAllProfanities)]
         public async Task<ActionResult<bool>> Delete()
         {
             return Ok(await _profanityService.ClearAsync());
         }
     }
-
-    
 }

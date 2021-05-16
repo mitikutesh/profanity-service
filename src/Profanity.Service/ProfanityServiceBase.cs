@@ -12,10 +12,8 @@ namespace Profanity.Service
 {
     public class ProfanityServiceBase
     {
-
         protected List<string> _profanities;
         protected readonly IProfanityWord _profanityDataService;
-
 
         /// <summary>
         /// initializes existing profanity list.
@@ -27,7 +25,6 @@ namespace Profanity.Service
             if (result != null)
                 _profanities = result.ProfanityWord;
         }
-
 
         /// <summary>
         ///allows custom  profanities replacing the existing list.
@@ -63,7 +60,7 @@ namespace Profanity.Service
             {
                 throw new ArgumentNullException(nameof(profanity));
             }
-            var response  = await _profanityDataService.DeleteProfanityAsync(profanity);
+            var response = await _profanityDataService.DeleteProfanityAsync(profanity);
             return response;
         }
 
@@ -77,21 +74,9 @@ namespace Profanity.Service
         /// clear or delete current loaded list.
         /// </summary>
         public async Task<bool> ClearAsync()
-           =>  await _profanityDataService.DeleteAllProfanityAsync();
+           => await _profanityDataService.DeleteAllProfanityAsync();
 
         public async Task<bool> ClearAsync(Language language)
        => await _profanityDataService.DeleteAllProfanityAsync();
-
-        /// <summary>
-        /// Countes and return number of profanities in a text.
-        /// </summary>
-        public int Count
-        {
-            get
-            {
-                return _profanities.Count;
-            }
-        }
     }
-
 }

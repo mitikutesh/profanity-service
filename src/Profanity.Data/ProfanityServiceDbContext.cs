@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Profanity.Data.Entities;
+using System;
 
 namespace Profanity.Data
 {
@@ -14,6 +15,14 @@ namespace Profanity.Data
         {
 
         }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                throw new Exception("MortgagePlannerContext is not configured. Ensure ConnectionString is set.");
+            }
+        }
+
 
         public virtual DbSet<ProfanityEntity> ProfanityEntities { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

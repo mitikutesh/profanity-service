@@ -31,7 +31,6 @@ namespace Profanity.API.Helper
                                     {
                                         "file", new OpenApiSchema()
                                         {
-                                            // matches our handcrafted yaml
                                             Type = "string",
                                             Format = "binary"
                                         }

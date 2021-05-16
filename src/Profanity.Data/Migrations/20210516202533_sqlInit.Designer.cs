@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Profanity.Data;
@@ -9,23 +10,28 @@ using Profanity.Data;
 namespace Profanity.Data.Migrations
 {
     [DbContext(typeof(ProfanityServiceDbContext))]
-    [Migration("20210515171412_Initial")]
-    partial class Initial
+    [Migration("20210516202533_sqlInit")]
+    partial class sqlInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.6");
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ProductVersion", "5.0.6")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Profanity.Data.Entities.ProfanityEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ProfanityWord")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("ProfanityWord")
+                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
 
