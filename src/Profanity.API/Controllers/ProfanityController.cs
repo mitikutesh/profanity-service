@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Profanity.API.Helper;
 using Profanity.API.Model;
+using Profanity.Data.DTO;
 using Profanity.Data.Entities;
 using Profanity.Service.Interfaces;
 using System;
@@ -17,10 +19,12 @@ namespace Profanity.API.Controllers
     public class ProfanityController : ControllerBase
     {
         private readonly IProfanityService _profanityService;
+        private readonly IMapper _mapper;
 
-        public ProfanityController(IProfanityService profanityService)
+        public ProfanityController(IProfanityService profanityService, IMapper mapper)
         {
             _profanityService = profanityService;
+            _mapper = mapper;
         }
         [HttpPost("check-text-for-profanity")]
         public async Task<ActionResult<ResponseModel>> Post([FromForm(Name = "file")] IFormFile file)
@@ -50,6 +54,7 @@ namespace Profanity.API.Controllers
         [HttpPost("add-words-to-profanity-list")]
         public async Task<IActionResult> PostAddToProfanityList(RequestModel request)
         {
+            var result  = _mapper.Map<RequestModel, ProfanityDTO>(request);
             _profanityService.AddProfanity(request.ProfanityWord);
             return default;
         }
