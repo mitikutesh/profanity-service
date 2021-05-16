@@ -10,13 +10,19 @@ namespace Profanity.API.Helper
 {
     public static class Extensions
     {
-        public static async Task<string> ToTextAsync(this IFormFile formFile, Encoding encoding)
+        public static async Task<string> ToByteArray(this IFormFile formFile, Encoding encoding)
         {
             if (formFile.Length > 0)
             {
                 using (var fileStream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(fileStream);
+                    //using (BinaryReader br = new BinaryReader(fileStream))
+                    //{
+                    //    byte[] bytes = br.ReadBytes((int)fileStream.Length);
+                    //}
+
+
                     string text = encoding.GetString(fileStream.ToArray());
                     fileStream.Flush();
 

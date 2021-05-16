@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Profanity.API.Helper;
 using Profanity.API.Model;
+using Profanity.Data.Entities;
+using Profanity.Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,17 +16,29 @@ namespace Profanity.API.Controllers
     [ApiController]
     public class ProfanityController : ControllerBase
     {
+        private readonly IProfanityService _profanityService;
+
+        public ProfanityController(IProfanityService profanityService)
+        {
+            _profanityService = profanityService;
+        }
         [HttpPost("check-text-for-profanity")]
         public async Task<ActionResult<ResponseModel>> Post([FromForm(Name = "file")] IFormFile file)
         {
             try
             {
-                string text = await file.ToTextAsync(Encoding.UTF8);
+                var text = await file.ToByteArray(Encoding.UTF8);
                 if (string.IsNullOrWhiteSpace(text))
                 {
                     return default;
                 }
+                
                 var response = new ResponseModel();
+                response.IsProfanity = _profanityService.IsProfanity(text);
+                response.FoundProfanityWords = _profanityService.FindAllProfanities(text);
+                response.Count = response.FoundProfanityWords.Count();
+                response.ElapasedTime = 0;
+
                 return Ok(response);
             }
             catch (Exception)
@@ -34,13 +48,14 @@ namespace Profanity.API.Controllers
 
         }
         [HttpPost("add-words-to-profanity-list")]
-        public async Task<IActionResult> PostAddToProfanityList(string word)
+        public async Task<IActionResult> PostAddToProfanityList(RequestModel request)
         {
+            _profanityService.AddProfanity(request.ProfanityWord);
             return default;
         }
 
         [HttpPost("remove-word-from-prfanity-list")]
-        public async Task<IActionResult> PostRemoveFromProfanityList(string word)
+        public async Task<IActionResult> PostRemoveFromProfanityList(RequestModel request)
         {
             return default;
         }

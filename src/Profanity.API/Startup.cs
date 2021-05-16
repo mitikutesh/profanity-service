@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -9,11 +11,19 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Profanity.API.Helper;
+using Profanity.API.Model;
 using Profanity.Data;
+using Profanity.Data.Entities;
 using Profanity.Data.Repositories;
+using Profanity.Service;
+using Profanity.Service.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Profanity.API
@@ -31,8 +41,14 @@ namespace Profanity.API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(fv =>
+                {
+                    fv.RunDefaultMvcValidationAfterFluentValidationExecutes = true;
+                })
+                .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
             services.AddScoped<IProfanityWord, ProfanityWord>();
+            services.AddScoped<IProfanityService, ProfanityService>();
             services.AddDbContext<ProfanityServiceDbContext>(options =>
             {
                 options.UseSqlite(
@@ -43,7 +59,11 @@ namespace Profanity.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Profanity.API", Version = "v1" });
                 c.OperationFilter<SwaggerFileOperationFilter>();
+                c.SchemaFilter<EnumSchemaFilter>();
+
             });
+            services.AddTransient<IValidator<RequestModel>, RequestModelValidator>();
+            services.AddTransient<IValidator<ProfanityEntity>, ProfanityEntityValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
