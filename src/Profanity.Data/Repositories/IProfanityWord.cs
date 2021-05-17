@@ -12,10 +12,11 @@ namespace Profanity.Data.Repositories
 
         Task<ProfanityDTO> GetProfanityByLanguageAsync(Language language);
 
-        Task<bool> AddToProfanityAsync(ProfanityDTO prospect);
+        Task<bool> AddToProfanityAsync(ProfanityDTO profanity);
 
         Task<bool> DeleteProfanityAsync(ProfanityDTO profanityDTO);
 
         Task<bool> DeleteAllProfanityAsync();
+       
     }
 }

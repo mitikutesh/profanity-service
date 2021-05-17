@@ -4,7 +4,7 @@ using System;
 
 namespace Profanity.Data
 {
-    public class ProfanityServiceDbContext : DbContext
+    public class ProfanityServiceDbContext : DbContext, IProfanityServiceDbContext
     {
         public ProfanityServiceDbContext()
         {
@@ -15,6 +15,7 @@ namespace Profanity.Data
         {
 
         }
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -24,7 +25,9 @@ namespace Profanity.Data
         }
 
 
-        public virtual DbSet<ProfanityEntity> ProfanityEntities { get; set; }
+        public DbSet<ProfanityEntity> ProfanityEntities { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ProfanityEntity>(entity =>
@@ -48,5 +51,11 @@ namespace Profanity.Data
         {
             dbSet.RemoveRange(dbSet);
         }
+    }
+
+    public interface IProfanityServiceDbContext
+    {
+        DbSet<ProfanityEntity> ProfanityEntities { get; }
+        int SaveChanges();
     }
 }

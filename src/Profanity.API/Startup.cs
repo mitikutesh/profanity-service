@@ -23,6 +23,7 @@ using Profanity.API.HealthCheck.SwaggerHelper;
 using Profanity.API.HealthCheck;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
+using Profanity.API.Controllers;
 
 namespace Profanity.API
 {
@@ -74,7 +75,7 @@ namespace Profanity.API
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Profanity.API", Version = "v1" });
+                c.SwaggerDoc($"v{MainApiVersion.MajorVersion}", new OpenApiInfo { Title = "Profanity.API", Version = $"V{MainApiVersion.MajorVersion}" });
                 c.OperationFilter<SwaggerFileOperationFilter>();
                 c.SchemaFilter<EnumSchemaFilter>();
                 c.SchemaFilter<SwaggerSchemaFilter>();
@@ -91,6 +92,14 @@ namespace Profanity.API
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
+
+            //api versioning
+            services.AddApiVersioning(config => {
+                config.DefaultApiVersion = MainApiVersion;
+                config.AssumeDefaultVersionWhenUnspecified = true;
+                config.ReportApiVersions = true;
+                config.Conventions.Controller<ProfanityController>().HasApiVersion(MainApiVersion);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -100,14 +109,14 @@ namespace Profanity.API
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Profanity.API v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint($"v{MainApiVersion.MajorVersion}/swagger.json", $"LTV API v{MainApiVersion.MajorVersion}"));
             }
 
             app.UseHttpsRedirection();
             app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions {
                 UseApiProblemDetailsException = true ,
                 ShowApiVersion = true, 
-                ApiVersion = "2.0",
+                ApiVersion = $"{MainApiVersion.MajorVersion}",
                 IsApiOnly = false,
                 WrapWhenApiPathStartsWith = "/api"
             });
@@ -119,18 +128,18 @@ namespace Profanity.API
             app.UseEndpoints(endpoints =>
             {
                 //just check if this api is up
-                endpoints.MapHealthChecks("api/heatlh", new HealthCheckOptions()
+                endpoints.MapHealthChecks($"api/{EndPoints.HealthQuickCheck}", new HealthCheckOptions()
                 {
                     Predicate = _ => false,
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
                 });
 
-                endpoints.MapHealthChecks("api/health/services", new HealthCheckOptions()
+                endpoints.MapHealthChecks($"api/{EndPoints.HealthService}", new HealthCheckOptions()
                 {
                     Predicate = reg => reg.Tags.Contains("Service"),
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
                 });// .RequireAuthorization(); in case i added authentication
-                endpoints.MapHealthChecks("api/health/database", new HealthCheckOptions()
+                endpoints.MapHealthChecks($"api/{EndPoints.HealthDatabase}", new HealthCheckOptions()
                 {
                     Predicate = reg => reg.Tags.Contains("Database"),
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse

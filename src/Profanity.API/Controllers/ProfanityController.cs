@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Profanity.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class ProfanityController : ControllerBase
     {
@@ -28,15 +28,16 @@ namespace Profanity.API.Controllers
         }
 
         [HttpPost(EndPoints.CheckProfanity)]
-        public async Task<ApiResponse> Post([FromForm(Name = "file")] IFormFile file, Language language)
+        public async Task<ApiResponse> Post(IFormFile file, Language language)
         {
             if (!ModelState.IsValid)
             {
                 throw new ApiProblemDetailsException(ModelState);
             }
-
+            
             try
             {
+                if (file == null) throw new ApiException("No file uploaded.");
                 var l = language;
                 var text = await file.ToByteArray(Encoding.UTF8);
                 if (string.IsNullOrWhiteSpace(text)) return default;

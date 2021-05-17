@@ -23,7 +23,7 @@ namespace Profanity.Data.Repositories
             {
                 var newProfanity = profanityDTO.ProfanityWord;
 
-                var existing = await _context.ProfanityEntities.FindAsync(profanityDTO.Language);
+                var existing = await _context.ProfanityEntities.Where(a => a.Language == profanityDTO.Language).FirstOrDefaultAsync(); 
                 if (existing != null)
                 {
                     var existingProfanity = Encoding.UTF8.GetString(existing.ProfanityWord)?.Split(',').ToList();
@@ -33,10 +33,6 @@ namespace Profanity.Data.Repositories
                     existing.ProfanityWord = Encoding.UTF8.GetBytes(finalString);
                     _context.ProfanityEntities.Update(existing);
                     await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    throw new Exception("nothing to remove");
                 }
                 return true;
             }

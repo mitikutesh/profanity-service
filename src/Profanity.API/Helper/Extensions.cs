@@ -12,6 +12,7 @@ namespace Profanity.API.Helper
     {
         public static async Task<string> ToByteArray(this IFormFile formFile, Encoding encoding)
         {
+            if (formFile == null) return null;
             if (formFile.Length > 0)
             {
                 using (var fileStream = new MemoryStream())

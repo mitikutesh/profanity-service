@@ -1,4 +1,7 @@
+using FluentAssertions;
 using NUnit.Framework;
+using Profanity.Data.DTO;
+using Profanity.Data.Entities;
 using Profanity.Service.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,7 +9,7 @@ using System.Threading.Tasks;
 namespace Profanity.Service.Test
 {
     [TestFixture]
-    public class Tests
+    public class ProfanityServiceTests 
     {
         private List<string> profanitites = new List<string>() { "fuck" };
         private IProfanityService profanityService;
@@ -17,24 +20,45 @@ namespace Profanity.Service.Test
             profanityService = new ProfanityService(new FakeProfanityDb());
         }
 
+      
+
         [Test]
-        public void Test1()
+        public async Task ContainsProfanity_Should_WordAsync(string term)
         {
-            Assert.Pass();
+            var val = (true, new List<string>(), 0, 0);
+            var result =  profanityService.ContainsProfanity("test if this test text has profanity");
+            result.Should().Equals(val);
         }
 
         [Test]
-        public async Task AddProfanity__Should_WorkAsync()
+        public async Task AddProfanityAsync_Sould_Work()
         {
-            var result = await profanityService.AddProfanityAsync(new Data.DTO.ProfanityDTO());
-
-            Assert.AreEqual(result, false);
+            var result = await profanityService.AddProfanityAsync(new ProfanityDTO() { });
+            result.Should().BeTrue();
         }
 
         [Test]
-        public void Remove_Prfanity_Should_Work() { Assert.Pass(); }
+        public async Task RemoveProfanityAsync_Should_Word()
+        {
+            var result = await profanityService.RemoveProfanityAsync(new ProfanityDTO() { });
+            result.Should().BeTrue();
+        }
 
         [Test]
-        public void Clear_Should_Clear_All_Prfanity() { Assert.Pass(); }
+        public async Task ClearAsync_Should_Word()
+        {
+            var result = await profanityService.ClearAsync();
+                result.Should().BeTrue();
+        }
+
+        [Test]
+        public async Task GetAllProfanitiesAsync_Should_Word()
+        {
+
+            var result = await profanityService.GetAllProfanitiesAsync(Language.EN);
+            result.Should().BeOfType<List<string>>();
+        }
+
+        //public (bool, List<string>, int, long)? ContainsProfanity(string term)
     }
 }

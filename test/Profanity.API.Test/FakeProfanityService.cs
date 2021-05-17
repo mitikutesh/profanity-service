@@ -5,11 +5,46 @@ using Profanity.Data.Repositories;
 using Profanity.Service.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Profanity.Service.Test
+namespace Profanity.API.Test
 {
+    [TestFixture]
+    public class FakeProfanityService : IProfanityService
+    {
+        public Task<bool> AddProfanityAsync(ProfanityDTO profanity)
+        {
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> ClearAsync()
+        {
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> ClearAsync(Language language)
+        {
+            return Task.FromResult(true);
+        }
+
+        public (bool, List<string>, int, long)? ContainsProfanity(string term)
+        {
+            return new(true, new List<string>(), 0, 0);
+        }
+
+        public Task<List<string>> GetAllProfanitiesAsync(Language language)
+        {
+            return Task.FromResult(new List<string>());
+        }
+
+        public Task<bool> RemoveProfanityAsync(ProfanityDTO profanity)
+        {
+            return Task.FromResult(true);
+        }
+    }
+
     [TestFixture]
     public class FakeProfanityDb : IProfanityWord
     {
@@ -42,4 +77,6 @@ namespace Profanity.Service.Test
             return Task.FromResult(new ProfanityDTO());
         }
     }
+
+   
 }

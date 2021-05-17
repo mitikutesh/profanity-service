@@ -29,7 +29,7 @@ namespace Profanity.Service
             {
                 return (false, null, 0, 0);
             }
-
+            if (!_profanities.Any()) throw new Exception("no prfanity list set");
             List<string> potentialProfanities = _profanities.Where(word => word.Length <= term.Length).ToList();
 
             // We might have a very short phrase coming in, resulting in no potential matches even before the regex

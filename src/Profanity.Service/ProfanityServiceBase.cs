@@ -56,7 +56,7 @@ namespace Profanity.Service
 
         public async Task<bool> RemoveProfanityAsync(ProfanityDTO profanity)
         {
-            if (profanity != null)
+            if (profanity == null)
             {
                 throw new ArgumentNullException(nameof(profanity));
             }
