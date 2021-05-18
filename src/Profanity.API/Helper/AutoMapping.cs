@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Profanity.API.Model;
 using Profanity.Data.DTO;
+using Profanity.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace Profanity.API.Helper
         public AutoMapping()
         {
             CreateMap<RequestModel, ProfanityDTO>(); // means you want to map from User to UserDTO
+            CreateMap<RegisterUser, User>();
         }
     }
 }

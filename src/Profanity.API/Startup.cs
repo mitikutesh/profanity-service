@@ -24,6 +24,11 @@ using Profanity.API.HealthCheck;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
 using Profanity.API.Controllers;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Profanity.API
 {
@@ -51,6 +56,10 @@ namespace Profanity.API
                     fv.RunDefaultMvcValidationAfterFluentValidationExecutes = true;
                 })
                 .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+           
+
+
             services.AddScoped<IProfanityWord, ProfanityWord>();
             services.AddScoped<IProfanityService, ProfanityService>();
 
@@ -70,12 +79,38 @@ namespace Profanity.API
             services.AddHealthChecks()
              .AddDbContextCheck<ProfanityServiceDbContext>("Context", null, new[] { "Database", "SQL" })
              .AddCheck("Profanity service healthceck", () => DbHealthCheckProvider.CheckProfanityTables(connString), new[] { "Database", "SQL" });
-            
 
+            services.AddScoped<IAccountService, AccountService>();
+
+            //jwt
+            services.AddJwtService(Configuration);
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc($"v{MainApiVersion.MajorVersion}", new OpenApiInfo { Title = "Profanity.API", Version = $"V{MainApiVersion.MajorVersion}" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Write bearer token in the field",
+                    Scheme = "Bearer",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme {
+                        Reference = new OpenApiReference {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer" },
+                        // Scheme = "oauth2",
+                        // Name = "Bearer",
+                        //In = ParameterLocation.Header
+                        },
+                    Array.Empty<string>()
+                }
+                });
+
                 c.OperationFilter<SwaggerFileOperationFilter>();
                 c.SchemaFilter<EnumSchemaFilter>();
                 c.SchemaFilter<SwaggerSchemaFilter>();
@@ -84,6 +119,7 @@ namespace Profanity.API
                 c.DocumentFilter<QuickHealthChecksFilter>();
 
             });
+           
             services.AddTransient<IValidator<RequestModel>, RequestModelValidator>();
             services.AddTransient<IValidator<ProfanityEntity>, ProfanityEntityValidator>();
 
@@ -108,8 +144,7 @@ namespace Profanity.API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint($"v{MainApiVersion.MajorVersion}/swagger.json", $"LTV API v{MainApiVersion.MajorVersion}"));
+               
             }
 
             app.UseHttpsRedirection();
@@ -123,7 +158,10 @@ namespace Profanity.API
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint($"v{MainApiVersion.MajorVersion}/swagger.json", $"Prfanity API v{MainApiVersion.MajorVersion}"));
 
             app.UseEndpoints(endpoints =>
             {
@@ -138,15 +176,17 @@ namespace Profanity.API
                 {
                     Predicate = reg => reg.Tags.Contains("Service"),
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                });// .RequireAuthorization(); in case i added authentication
+                }).RequireAuthorization(); 
                 endpoints.MapHealthChecks($"api/{EndPoints.HealthDatabase}", new HealthCheckOptions()
                 {
                     Predicate = reg => reg.Tags.Contains("Database"),
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                });// .RequireAuthorization(); in case i added authentication
+                }).RequireAuthorization();
 
                 endpoints.MapControllers();
             });
+
+          
         }
     }
 }

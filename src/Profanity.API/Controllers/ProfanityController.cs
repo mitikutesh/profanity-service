@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoWrapper.Wrappers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Profanity.API.Helper;
@@ -14,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace Profanity.API.Controllers
 {
+    [Authorize]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class ProfanityController : ControllerBase
@@ -28,6 +30,9 @@ namespace Profanity.API.Controllers
         }
 
         [HttpPost(EndPoints.CheckProfanity)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ApiResponse> Post(IFormFile file, Language language)
         {
             if (!ModelState.IsValid)
@@ -60,6 +65,9 @@ namespace Profanity.API.Controllers
         }
 
         [HttpPut(EndPoints.AddWordToProfanity)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> PostAddToProfanityList([FromBody] RequestModel request)
         {
             if (!ModelState.IsValid)
@@ -72,6 +80,9 @@ namespace Profanity.API.Controllers
         }
 
         [HttpPost(EndPoints.RemoveWordFromProfanity)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<bool>> PostRemoveFromProfanityList([FromBody] RequestModel request)
         {
             if (!ModelState.IsValid)
@@ -83,6 +94,11 @@ namespace Profanity.API.Controllers
         }
 
         [HttpGet(EndPoints.GetProfanitites)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<List<string>>> Get(Language language)
         {
             if (!ModelState.IsValid)
@@ -93,6 +109,9 @@ namespace Profanity.API.Controllers
         }
 
         [HttpDelete(EndPoints.ClearSpecificProfanitites)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<bool>> DeleteByLanguage(Language language)
         {
             if (!ModelState.IsValid)
@@ -103,6 +122,9 @@ namespace Profanity.API.Controllers
         }
 
         [HttpDelete(EndPoints.ClearAllProfanities)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<bool>> Delete()
         {
             return Ok(await _profanityService.ClearAsync());

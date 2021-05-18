@@ -26,6 +26,7 @@ namespace Profanity.Data
 
 
         public DbSet<ProfanityEntity> ProfanityEntities { get; set; }
+        public virtual DbSet<User> Api_Users { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -36,6 +37,13 @@ namespace Profanity.Data
                 entity.Property(e => e.Language)
                 .HasConversion<int>();
                 
+            });
+
+            modelBuilder.Entity<User>().OwnsMany(p => p.Refresh_Tokens, a =>
+            {
+                a.WithOwner().HasForeignKey("OwnerId");
+                a.Property<int>("Id");
+                a.HasKey("Id");
             });
             base.OnModelCreating(modelBuilder);
         }
