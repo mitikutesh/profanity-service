@@ -10,6 +10,6 @@ namespace Profanity.API.Model
         public bool IsProfanity { get; set; }
         public int Count { get; set; }
         public IEnumerable<string> FoundProfanityWords { get; set; }
-        public long ElapasedTime { get; set; }
+        public long ElapasedTimeInMs { get; set; }
     }
 }

@@ -54,7 +54,7 @@ namespace Profanity.API.Controllers
                     IsProfanity = result.Value.Item1,
                     FoundProfanityWords = result.Value.Item2,
                     Count = result.Value.Item3,
-                    ElapasedTime = result.Value.Item4
+                    ElapasedTimeInMs = result.Value.Item4
                 };
                 return new ApiResponse(response);
             }
