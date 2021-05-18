@@ -1,24 +1,16 @@
-using NUnit.Framework;
-using Profanity.Data.Repositories;
-using Profanity.Data;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Data.Entity;
-using Profanity.Data.Test.Context;
-using Profanity.Data.Entities;
-using FakeItEasy.Sdk;
 using Microsoft.EntityFrameworkCore;
-using System;
-using Microsoft.Extensions.Configuration;
+using NUnit.Framework;
 using Profanity.Data.DTO;
+using Profanity.Data.Entities;
+using Profanity.Data.Repositories;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 
 namespace Profanity.Data.Test
 {
- 
-
-    //[TestFixture]
-    public class ProfanityDataTests 
+    [TestFixture]
+    public class ProfanityDataTests
     {
         private IProfanityWord profanityword;
         IProfanityServiceDbContext dbContext;
@@ -37,7 +29,7 @@ namespace Profanity.Data.Test
         [Test]
         public async Task AddToProfanityAsync_Should_Workd()
         {
-            var response =await profanityword.AddToProfanityAsync(new ProfanityDTO { Language = Language.EN, ProfanityWord = new List<string> { "test" } });
+            var response = await profanityword.AddToProfanityAsync(new ProfanityDTO { Language = Language.EN, ProfanityWord = new List<string> { "test" } });
             response.Should().Be(true);
         }
 
@@ -55,7 +47,7 @@ namespace Profanity.Data.Test
             response.Should().Be(true);
         }
 
-     
+
         [Test]
         public async Task GetProfanityByLanguageAsync_Should_Workd()
         {
