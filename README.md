@@ -15,7 +15,7 @@ NOTE : Make sure to have a dotnet run installed on your machine
 dotnet run
 ```
 
-### Running Unit Test
+### Running UnitTest
 ```sh
 dotnet test
 
